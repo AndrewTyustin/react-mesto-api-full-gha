@@ -8,8 +8,8 @@
 
 ## Ссылки на проект
 
-IP-адрес x.x.x.x
+IP-адрес 158.160.61.229
 
-Frontend https://...
+Frontend https://andrewtyustin.students.nomoredomains.monster
 
-Backend https://...
+Backend https://api.andrewtyust.students.nomoredomains.monster
