@@ -16,7 +16,7 @@ function Card(props) {
   }
 
   return (
-    <div className="cards__item" key={props.keys}>
+    <div className="cards__item">
       {isOwn && (
         <button
           type="button"
@@ -46,7 +46,7 @@ function Card(props) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default Card;

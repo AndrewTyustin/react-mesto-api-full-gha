@@ -29,27 +29,30 @@ function App() {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const history = useHistory();
   useEffect(() => {
-    isLoggedIn &&
-    Promise.all([apiConnect.getUserData(), apiConnect.getInitialCards()])
-      .then(([userItem, initialCards]) => {
-        setCurrentUser(userItem);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(`Возникла глобальная ошибка, ${err}`);
-      });
-  }, [history, isLoggedIn]);
+    const token = localStorage.getItem("token");
+    if (token) {
+      Promise.all([apiConnect.getUserData(), apiConnect.getInitialCards()])
+        .then(([userItem, initialCards]) => {
+          setCurrentUser(userItem);
+          setCards(initialCards);
+        })
+        .catch((err) => {
+          console.log(`Возникла глобальная ошибка, ${err}`);
+        });
+    }
+  }, [isLoggedIn]);
   useEffect(() => {
-    const userToken = localStorage.getItem("token");
-    if (userToken) {
+    const token = localStorage.getItem("token");
+    if (token) {
       apiAuth
-        .tokenVerification(userToken)
+        .tokenVerification(token)
         .then((res) => {
-          setEmail(res.data.email);
           setIsLoggedIn(true);
+          setEmail(res.email);
           history.push("/");
         })
         .catch((err) => {
+          localStorage.removeItem("token");
           console.log(`Возникла ошибка верификации токена, ${err}`);
         });
     }
@@ -67,8 +70,8 @@ function App() {
     apiConnect
       .deleteCard(card._id)
       .then(() => {
-        setCards((cardsArray) =>
-          cardsArray.filter((cardItem) => cardItem._id !== card._id)
+        setCards((listCards) =>
+          listCards.filter((cardItem) => cardItem._id !== card._id)
         );
       })
       .catch((err) => {
@@ -95,16 +98,12 @@ function App() {
     });
   }
   function handleCardLike(card) {
-    const isLiked = card.likes.some(
-      (cardItem) => cardItem._id === currentUser._id
-    );
+    const isLiked = card.likes.some((like) => like === currentUser._id);
     apiConnect
       .changeLikeCardStatus(card._id, !isLiked)
-      .then((cardsItem) => {
-        setCards((state) =>
-          state.map((cardItem) =>
-            cardItem._id === card._id ? cardsItem : cardItem
-          )
+      .then((cardItem) => {
+        setCards((listCards) =>
+          listCards.map((item) => (item._id === card._id ? cardItem : item))
         );
       })
       .catch((err) => {
@@ -156,11 +155,11 @@ function App() {
   function handleLogin(password, email) {
     apiAuth
       .userAuthorization(password, email)
-      .then((res) => {
-        if (res.token) {
-          localStorage.setItem("token", res.token);
-          setEmail(email);
+      .then(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
           setIsLoggedIn(true);
+          setEmail(email);
           history.push("/");
         }
       })
@@ -170,7 +169,6 @@ function App() {
         setStatus(false);
       });
   }
-  // Функция выхода пользователя
   function handleLogout() {
     localStorage.removeItem("token");
     setIsLoggedIn(false);

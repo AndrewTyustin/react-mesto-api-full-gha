@@ -1,20 +1,20 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const { ValidationError, CastError } = mongoose.Error;
 
-const User = require("../models/user");
+const User = require('../models/user');
 
 const {
   SUCCESS_CREATED,
   DUPLICATE_OBJECT,
-} = require("../utils/response-status");
+} = require('../utils/response-status');
 
-const NotFound = require("../utils/response-errors/NotFound");
-const BadRequests = require("../utils/response-errors/BadRequest");
-const ConflictingRequest = require("../utils/response-errors/ConflictingRequest");
+const NotFound = require('../utils/response-errors/NotFound');
+const BadRequests = require('../utils/response-errors/BadRequest');
+const ConflictingRequest = require('../utils/response-errors/ConflictingRequest');
 
 const getUserList = (req, res, next) => {
   User.find({})
@@ -28,13 +28,13 @@ const getUserId = (req, res, next) => {
       if (selectedUser) {
         res.send(selectedUser);
       } else {
-        next(new NotFound("Пользователь по указанному _id не найден"));
+        next(new NotFound('Пользователь по указанному _id не найден'));
       }
     })
     .catch((error) => {
       // https://mongoosejs.com/docs/api/error.html#error_Error-CastError
       if (error instanceof CastError) {
-        next(new BadRequests("Некорректный _id запрашиваемого пользователя"));
+        next(new BadRequests('Некорректный _id запрашиваемого пользователя'));
       } else {
         next(error);
       }
@@ -42,39 +42,37 @@ const getUserId = (req, res, next) => {
 };
 
 const registerUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   const passwordHash = bcrypt.hash(password, 10);
   passwordHash
-    .then((hash) =>
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
-    )
-    .then(() =>
-      res.status(SUCCESS_CREATED).send({
-        name,
-        about,
-        avatar,
-        email,
-      })
-    )
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then(() => res.status(SUCCESS_CREATED).send({
+      name,
+      about,
+      avatar,
+      email,
+    }))
     .catch((error) => {
       // https://mongoosejs.com/docs/api/error.html#error_Error-ValidationError
       if (error instanceof ValidationError) {
         next(
           new BadRequests(
-            "Переданы некорректные данные при создании пользователя"
-          )
+            'Переданы некорректные данные при создании пользователя',
+          ),
         );
       } else if (error.code === DUPLICATE_OBJECT) {
         next(
           new ConflictingRequest(
-            "Пользователь с указанной почтой уже есть в системе"
-          )
+            'Пользователь с указанной почтой уже есть в системе',
+          ),
         );
       } else {
         next(error);
@@ -90,14 +88,14 @@ const updateUserData = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .then((updatedData) => res.send(updatedData))
     .catch((error) => {
       // https://mongoosejs.com/docs/api/error.html#error_Error-CastError
       if (error instanceof ValidationError) {
         next(
-          new BadRequests("Переданы некорректные данные при обновлении профиля")
+          new BadRequests('Переданы некорректные данные при обновлении профиля'),
         );
       } else {
         next(error);
@@ -113,14 +111,14 @@ const updateUserAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .then((updatedAvatar) => res.send(updatedAvatar))
     .catch((error) => {
       // https://mongoosejs.com/docs/api/error.html#error_Error-CastError
       if (error instanceof ValidationError) {
         next(
-          new BadRequests("Переданы некорректные данные при обновлении аватара")
+          new BadRequests('Переданы некорректные данные при обновлении аватара'),
         );
       } else {
         next(error);
@@ -134,8 +132,8 @@ const authorizeUser = (req, res, next) => {
     .then((selectedUser) => {
       const token = jwt.sign(
         { _id: selectedUser._id },
-        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
-        { expiresIn: "7d" }
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
       );
       res.send({ token });
     })
@@ -146,7 +144,7 @@ const getUserProfile = (req, res, next) => {
   User.findById(req.user._id)
     .then((selectedUser) => {
       if (!selectedUser) {
-        next(new NotFound("Пользователь по указанному _id не найден"));
+        next(new NotFound('Пользователь по указанному _id не найден'));
       } else {
         res.send(selectedUser);
       }

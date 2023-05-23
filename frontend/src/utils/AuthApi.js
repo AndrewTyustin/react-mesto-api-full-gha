@@ -1,6 +1,6 @@
 class AuthApi {
-  constructor(authUrl) {
-    this._authUrl = authUrl;
+  constructor(apiAddress) {
+    this._authUrl = apiAddress;
   }
   _processingServerResponse(res) {
     if (res.ok) {
@@ -13,7 +13,7 @@ class AuthApi {
     return fetch(`${this._authUrl}users/me`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        authorization: `Bearer ${token}`,
       },
     }).then(this._processingServerResponse);
   }
@@ -24,7 +24,13 @@ class AuthApi {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ password, email }),
-    }).then(this._processingServerResponse);
+    })
+      .then(this._processingServerResponse)
+      .then((userData) => {
+        if (userData.token) {
+          localStorage.setItem("token", userData.token);
+        }
+      });
   }
   userRegistration(password, email) {
     return fetch(`${this._authUrl}signup`, {
@@ -37,5 +43,5 @@ class AuthApi {
   }
 }
 
-const apiAuth = new AuthApi("https://auth.nomoreparties.co/");
+const apiAuth = new AuthApi("http://localhost:3000/");
 export default apiAuth;

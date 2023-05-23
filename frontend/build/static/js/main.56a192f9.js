@@ -1,3 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-cond-assign */
+/* eslint-disable default-case */
+/* eslint-disable no-unused-expressions */
 !(function () {
   var e = {
       110: function (e, n, t) {
