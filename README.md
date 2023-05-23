@@ -10,6 +10,6 @@
 
 IP-адрес 158.160.61.229
 
-Frontend https://andrewtyustin.students.nomoredomains.monster
+Frontend https://andrewtyustin.students.nomoredomains.monster/
 
-Backend https://api.andrewtyust.students.nomoredomains.monster
+Backend https://api.andrewtyust.students.nomoredomains.monster/
