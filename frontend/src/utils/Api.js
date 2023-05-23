@@ -85,5 +85,5 @@ class Api {
   }
 }
 
-const apiConnect = new Api('http://localhost:3000/');
+const apiConnect = new Api('https://api.andrewtyust.students.nomoredomains.monster/');
 export default apiConnect;

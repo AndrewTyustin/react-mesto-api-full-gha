@@ -43,5 +43,5 @@ class AuthApi {
   }
 }
 
-const apiAuth = new AuthApi("http://localhost:3000/");
+const apiAuth = new AuthApi("https://api.andrewtyust.students.nomoredomains.monster/");
 export default apiAuth;
