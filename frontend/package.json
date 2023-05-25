@@ -1,6 +1,7 @@
 {
   "name": "mesto-react-auth",
   "version": "0.1.0",
+  "homepage": "https://andrewtyustin.students.nomoredomains.monster/",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
