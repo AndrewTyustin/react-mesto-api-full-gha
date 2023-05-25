@@ -4,7 +4,7 @@ const regular = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9
 
 const validateUserAuth = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().min(4).max(50).email()
+    email: Joi.string().min().max().email()
       .required(),
     password: Joi.string().required(),
   }),
@@ -12,10 +12,12 @@ const validateUserAuth = celebrate({
 
 const validateUserRegister = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30)
+      .required(),
+    about: Joi.string().min(2).max(30)
+      .required(),
     avatar: Joi.string().pattern(regular),
-    email: Joi.string().min(4).max(50).email()
+    email: Joi.string().min().max().email()
       .required(),
     password: Joi.string().required(),
   }),
@@ -36,7 +38,8 @@ const validateUserUpdate = celebrate({
 
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().min(4).pattern(regular),
+    avatar: Joi.string().min().pattern(regular)
+      .required(),
   }),
 });
 

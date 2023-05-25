@@ -43,5 +43,6 @@ class AuthApi {
   }
 }
 
+
 const apiAuth = new AuthApi("https://api.andrewtyust.students.nomoredomains.monster/");
 export default apiAuth;

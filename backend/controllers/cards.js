@@ -11,7 +11,7 @@ const BadRequests = require('../utils/response-errors/BadRequest');
 const Forbidden = require('../utils/response-errors/Forbidden');
 
 const getCardList = (req, res, next) => {
-  Card.find({})
+  Card.find({}).sort({ createdAt: -1 })
     .then((cardList) => res.send(cardList))
     .catch((error) => next(error));
 };

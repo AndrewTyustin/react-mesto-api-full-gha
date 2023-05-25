@@ -1,4 +1,4 @@
-class Api {
+class Api {яяя
   constructor(apiAddress) {
     this._link = apiAddress;
   }

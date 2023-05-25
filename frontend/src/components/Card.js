@@ -3,8 +3,8 @@ import CurrentUserContext from "../contexts/CurrentUserContext";
 
 function Card(props) {
   const userItem = useContext(CurrentUserContext);
-  const isOwn = props.card.owner._id === userItem._id;
-  const isLiked = props.card.likes.some((item) => item._id === userItem._id);
+  const isOwn = (props.card.owner._id || props.card.owner) === userItem._id;
+  const isLiked = props.card.likes.some(i => i === userItem._id);
   function handleClick() {
     props.onCardClick(props.card);
   }
