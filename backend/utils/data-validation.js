@@ -12,10 +12,8 @@ const validateUserAuth = celebrate({
 
 const validateUserRegister = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30)
-      .required(),
-    about: Joi.string().min(2).max(30)
-      .required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(regular),
     email: Joi.string().min().max().email()
       .required(),
@@ -31,8 +29,10 @@ const validateUserId = celebrate({
 
 const validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30)
+      .required(),
+    about: Joi.string().min(2).max(30)
+      .required(),
   }),
 });
 
