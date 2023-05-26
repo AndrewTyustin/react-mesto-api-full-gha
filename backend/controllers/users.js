@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { JWT_SECRET } = require('../utils/config');
+
 const { ValidationError, CastError } = mongoose.Error;
 
 const User = require('../models/user');
@@ -128,16 +129,17 @@ const updateUserAvatar = (req, res, next) => {
 
 const authorizeUser = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((selectedUser) => {
-      const token = jwt.sign(
-        { _id: selectedUser._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-        { expiresIn: '7d' },
-      );
-      res.send({ token });
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+        sameSite: true,
+      })
+        .send({ message: 'Успешная авторизация' });
     })
-    .catch((error) => next(error));
+    .catch(next);
 };
 
 const getUserProfile = (req, res, next) => {
