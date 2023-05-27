@@ -16,9 +16,6 @@ function Login(props) {
     setPassword("");
     setEmail("");
   }
-  if (props) {
-    return <NavLink to='/' />
-  }
 
   return (
     <>

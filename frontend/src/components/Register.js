@@ -17,10 +17,6 @@ function Register(props) {
     setPassword('');
     setEmail('');
   }
-  if (props) {
-    return <NavLink to='/' />
-  }
-
   return (
     <>
       <div className="auth">
