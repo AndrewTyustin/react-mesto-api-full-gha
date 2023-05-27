@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET } = require('../utils/config');
-
+const { NODE_ENV, JWT_SECRET } = process.env;
 const { ValidationError, CastError } = mongoose.Error;
 
 const User = require('../models/user');
@@ -11,18 +10,21 @@ const User = require('../models/user');
 const {
   SUCCESS_CREATED,
   DUPLICATE_OBJECT,
-} = require('../utils/response-status');
+} = require('../utils/response-status'); // 201 и 11000
 
-const NotFound = require('../utils/response-errors/NotFound');
-const BadRequests = require('../utils/response-errors/BadRequest');
-const ConflictingRequest = require('../utils/response-errors/ConflictingRequest');
+// Классы ошибок
+const NotFound = require('../utils/response-errors/NotFound'); // 404
+const BadRequests = require('../utils/response-errors/BadRequest'); // 400
+const ConflictingRequest = require('../utils/response-errors/ConflictingRequest'); // 409
 
+// Получение списка пользователей
 const getUserList = (req, res, next) => {
   User.find({})
     .then((userList) => res.send(userList))
     .catch(next);
 };
 
+// Получение пользователя по ID
 const getUserId = (req, res, next) => {
   User.findById(req.params.userId)
     .then((selectedUser) => {
@@ -42,6 +44,7 @@ const getUserId = (req, res, next) => {
     });
 };
 
+// Создание пользователя (Регистрация)
 const registerUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -55,6 +58,7 @@ const registerUser = (req, res, next) => {
       email,
       password: hash,
     }))
+    // Не передаём пароль в ответе
     .then(() => res.status(SUCCESS_CREATED).send({
       name,
       about,
@@ -81,6 +85,7 @@ const registerUser = (req, res, next) => {
     });
 };
 
+// Обновление профиля пользователя
 const updateUserData = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
@@ -104,6 +109,7 @@ const updateUserData = (req, res, next) => {
     });
 };
 
+// Обновление аватара пользователя
 const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -127,21 +133,22 @@ const updateUserAvatar = (req, res, next) => {
     });
 };
 
+// Авторизация пользователя
 const authorizeUser = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        sameSite: true,
-      })
-        .send({ message: 'Успешная авторизация' });
+  return User.findUserByCredentials(email, password)
+    .then((selectedUser) => {
+      const token = jwt.sign(
+        { _id: selectedUser._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
     })
-    .catch(next);
+    .catch((error) => next(error));
 };
 
+// Получение профиля пользователя
 const getUserProfile = (req, res, next) => {
   User.findById(req.user._id)
     .then((selectedUser) => {
