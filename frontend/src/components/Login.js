@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom/cjs/react-router-dom.min";
 
 function Login(props) {
   const [email, setEmail] = useState("");
@@ -14,6 +15,9 @@ function Login(props) {
     props.handleLogin(password, email);
     setPassword("");
     setEmail("");
+  }
+  if (props) {
+    return <NavLink to='/' />
   }
 
   return (
