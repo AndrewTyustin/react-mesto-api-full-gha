@@ -35,6 +35,7 @@ function App() {
         .then(([userItem, initialCards]) => {
           setCurrentUser(userItem);
           setCards(initialCards);
+          setCards(initialCards.reverse());
         })
         .catch((err) => {
           console.log(`Возникла глобальная ошибка, ${err}`);

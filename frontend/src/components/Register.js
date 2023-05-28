@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { NavLink } from "react-router-dom/cjs/react-router-dom.min";
+
 
 function Register(props) {
   const [email, setEmail] = useState("");
