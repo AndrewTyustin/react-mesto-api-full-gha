@@ -60,52 +60,39 @@ const deleteCard = (req, res, next) => {
     });
 };
 
-const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((selectedCard) => {
-      if (selectedCard) {
-        res.send(selectedCard);
-      } else {
-        next(new NotFound('Карточка по указанному _id не найдена'));
+const changeLikeCardStatus = (req, res, next, likeOtpions) => {
+  const { cardId } = req.params;
+
+  Card.findById(cardId)
+    .then((card) => {
+      if (!card) {
+        throw new NotFound('Такой карточки нет');
       }
+      return Card.findByIdAndUpdate(cardId, likeOtpions, { new: true })
+        .then((cardForLike) => cardForLike.populate(['owner', 'likes']))
+        .then((cardForLike) => {
+          res.send(cardForLike);
+        });
     })
-    .catch((error) => {
-      // https://mongoosejs.com/docs/api/error.html#error_Error-CastError
-      if (error instanceof CastError) {
-        next(
-          new BadRequests('Переданы некорректные данные для постановки лайка'),
-        );
+    .catch((err) => {
+      if (err instanceof CastError) {
+        next(new BadRequests('Некорректный Id карточки'));
       } else {
-        next(error);
+        next(err);
       }
     });
 };
 
+const likeCard = (req, res, next) => {
+  const { _id: userId } = req.user;
+  const likeOptions = { $addToSet: { likes: userId } };
+  changeLikeCardStatus(req, res, next, likeOptions);
+};
+
 const removeLikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((selectedCard) => {
-      if (selectedCard) {
-        res.send(selectedCard);
-      } else {
-        next(new NotFound('Карточка по указанному _id не найдена'));
-      }
-    })
-    .catch((error) => {
-      // https://mongoosejs.com/docs/api/error.html#error_Error-CastError
-      if (error instanceof CastError) {
-        next(new BadRequests('Переданы некорректные данные для снятии лайка'));
-      } else {
-        next(error);
-      }
-    });
+  const { _id: userId } = req.user;
+  const likeOptions = { $pull: { likes: userId } };
+  changeLikeCardStatus(req, res, next, likeOptions);
 };
 
 module.exports = {
